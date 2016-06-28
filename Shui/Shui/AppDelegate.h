@@ -8,10 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@class MainViewController;
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
+// Init a new viewcontroller
+@property (strong, nonatomic) MainViewController *mainViewController;
 
 @end
 
