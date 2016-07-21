@@ -8,6 +8,7 @@
 
 #import "MainViewController.h"
 #import "SearchResult.h"
+#import "SearchResultCell.h"
 
 @interface MainViewController () <UITableViewDataSource, UITableViewDelegate>
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
@@ -22,6 +23,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    UINib *cellNib = [UINib nibWithNibName:@"SearchResultCell" bundle:nil];
+    [self.tableView registerNib:cellNib forCellReuseIdentifier:@"SearchResultCell"];
+    self.tableView.rowHeight = 80;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -32,24 +36,38 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (_searchResults == nil) {
         return 0;
+    } else if ([_searchResults count] == 0) {
+        return 1;
     } else {
         return [_searchResults count];
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *CellIdentifier = @"SearchResultCell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+    SearchResultCell *cell = (SearchResultCell *)[tableView dequeueReusableCellWithIdentifier:@"SearchResultCell"];
+
+    if ([_searchResults count] == 0) {
+        cell.nameLabel.text = @"(Nothing found)";
+    } else {
+        SearchResult *searchResult = _searchResults[indexPath.row];
+        cell.nameLabel.text = searchResult.name;
     }
     
-    SearchResult *searchResult = _searchResults[indexPath.row];
-    cell.textLabel.text = searchResult.name;
-    cell.detailTextLabel.text = searchResult.content;
-    
     return cell;
+}
+
+#pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([_searchResults count] == 0) {
+        return nil;
+    } else {
+        return indexPath;
+    }
 }
 
 /*
